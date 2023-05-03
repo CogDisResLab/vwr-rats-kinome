@@ -6,6 +6,7 @@ library(creedenzymatic)
 krsa_df <-
   read_csv("results/HPC-krsa_table_full_Exer_HPC_CTL_HPC_STK.csv") |>
   select(Kinase, Score = AvgZ) |>
+  unique() |>
   read_krsa(trns = "abs", sort = "desc")
 
 uka_df <- read_tsv("kinome_data/UKA-STK/HPC/Summaryresults 20230404-1530.txt") |> select(Kinase = `Kinase Name`, Score = `Median Final score`) |>
@@ -35,11 +36,20 @@ ptmsea_df <- diff_peps |>
 combined <- combine_tools(krsa_df, uka_df, kea_df, ptmsea_df) |>
   write_csv("results/HPC-STK-Combined_Tools.csv")
 
+top_kinases <- krsa_df |>
+  filter(Score >= 1.5) |>
+  pull(Kinase)
+
+top_kinase_symbols <- kinome_mp_file |>
+  filter(krsa_id %in% top_kinases) |>
+  pull(hgnc_symbol)
+
 sig_kinases <- combined |>
-  filter(Qrt == 4, Method == "KRSA", Score >= quantile(Score,0.80)) |>
+  filter(Perc >= 0.95) |>
   pull(hgnc_symbol) |>
   unique()
 
-combined |>
+quartile_fig <- combined |>
   filter(hgnc_symbol %in% sig_kinases) |>
-  quartile_figure()
+  quartile_figure() |>
+  ggsave("figures/hpc_stk_quartile_figure.png", plot = _, width = 18, height = 6, units = "in", bg = "white")
