@@ -200,9 +200,9 @@ krsa_violin_plot(data_modeled$scaled, clean_peptides, "Group")
 #| fig-cap: "Violin Plots for signal intensity Distribution Across Chips for all replicates"
 
 # Plot a violin figure and facet by the (Barcode) variable
-krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode")
+krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("CTL_HPC", "Exer_HPC"))
 
-
+ggsave("figures/HPC_STK_Violin-Plots.svg", width = 11, height = 8.5, plot = {krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("CTL_HPC", "Exer_HPC"))})
 ```
 
 ### Global Heatmaps
@@ -216,7 +216,11 @@ The heatmap represent all the peptides present on the chip except the positive/i
 #| fig-width: 6
 
 # Generates a heatmap using the modeled normalized data
-krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row")
+krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("CTL_HPC", "Exer_HPC"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
+
+svg("figures/HPC_STK_Heatmap.svg", width = 8.5, height = 11)
+krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("CTL_HPC", "Exer_HPC"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
+dev.off()
 
 ```
 
