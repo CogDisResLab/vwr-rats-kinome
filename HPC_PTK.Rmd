@@ -217,7 +217,7 @@ The heatmap represent all the peptides present on the chip except the positive/i
 
 # Generates a heatmap using the modeled normalized data
 krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("HPC_CTL", "HPC_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
-
+dev.off()
 svg("figures/HPC_PTK_Heatmap.svg", width = 8.5, height = 11)
 krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("HPC_CTL", "HPC_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
 dev.off()
