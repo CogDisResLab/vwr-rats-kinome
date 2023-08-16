@@ -1,6 +1,6 @@
 ---
-title: "Neuron Fingerprint - STK"
-subtitle: "Nicholas Henkel"
+title: "Exercise Project - PTK - Striatum"
+subtitle: "LiLian Yuan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Cognitive Disorders Research Lab"
 format: 
@@ -15,9 +15,9 @@ format:
 editor: source
 toc: true
 params:
-  chip_type: "STK" # Change the Chip Type to PTK if needed
-  signal_file: "kinome_data/_KRSAsOutput_Median_SigmBg_230103164304.txt" # Change the file name to the one you have
-  saturation_file: "kinome_data/_KRSAsOutput_Signal_Saturation_230103164304.txt" # Change the file name to the one you have
+  chip_type: "PTK" # Change the Chip Type to PTK if needed
+  signal_file: "kinome_data/PTK_ExportstosDB_Median_SigmBg_200716215555.txt" # Change the file name to the one you have
+  saturation_file: "kinome_data/PTK_ExportstosDB_Signal_Saturation_200716215557.txt" # Change the file name to the one you have
   threshold: 2 # Change the threshold if necessary
 ---
 
@@ -39,6 +39,8 @@ library(tidyverse)
 
 library(gt)
 library(furrr)
+
+run_prefix <- "HPC"
 ```
 
 # Introduction
@@ -114,14 +116,12 @@ We will perform a couple of quality control steps to deal with negative values i
 qc_data <- krsa_qc_steps(raw_data) %>% 
   mutate(
   Group = case_when(
-    SampleName == "1" ~ "KD-UT",
-    SampleName == "2" ~ "KD-AI",
-    SampleName == "3" ~ "WT-UT",
-    SampleName == "4" ~ "WT-AI",
-    TRUE ~ SampleName
+    SampleName == "CTR_STR" ~ "CTL_STR",
+    .default =  SampleName
   ),
   SampleName = paste0(Group, "_" , Barcode)
-)
+) |> 
+  filter(Barcode != "710230320")
 
 groups <- unique(qc_data$Group)
 
@@ -200,9 +200,9 @@ krsa_violin_plot(data_modeled$scaled, clean_peptides, "Group")
 #| fig-cap: "Violin Plots for signal intensity Distribution Across Chips for all replicates"
 
 # Plot a violin figure and facet by the (Barcode) variable
-krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode")
+krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("STR_CTL", "STR_Exer"))
 
-
+ggsave("figures/HPC_PTK_Violin-Plots.svg", width = 11, height = 8.5, plot = {krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("STR_CTL", "STR_Exer"))})
 ```
 
 ### Global Heatmaps
@@ -216,7 +216,11 @@ The heatmap represent all the peptides present on the chip except the positive/i
 #| fig-width: 6
 
 # Generates a heatmap using the modeled normalized data
-krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row")
+krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("STR_CTL", "STR_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
+
+svg("figures/HPC_PTK_Heatmap.svg", width = 8.5, height = 11)
+krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("STR_CTL", "STR_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
+dev.off()
 
 ```
 
@@ -235,9 +239,7 @@ krsa_heatmap_grouped(data_modeled$grouped, clean_peptides, scale = "row")
 
 To compare between samples, a two-group comparison is performed. In this case, there are three group comparisons:
 
--   AMPK KD Neuron + Untreated vs Wild Type Neuron + AICAR
--   AMPK KD Neuron + Untreated vs Wild Type Neuron + Untreated
--   AMPK KD Neuron + AICAR vs Wild Type Neuron + AICAR
+-   Exercise Hippocampus vs Control Hippocampus
 
 The *Slope_Transformed* ratio between each group, paired by chip, is calculated to the fold change. Based on the fold change, peptides that pass a certain fold change threshold are considered significant hits. Also, quality control steps applied in each comparison to filter out peptides that do not reach specific criteria:
 
@@ -260,10 +262,7 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 # Also make sure that the label is unique for each block
 
 # Define Groups to be compared
-comparisons <- list(COMP1 = c(groups[1], groups[4]),
-                    COMP2 = c(groups[1], groups[3]),
-                    COMP3 = c(groups[2], groups[4]),
-                    COMP4 = c(groups[4], groups[3]))
+comparisons <- list(COMP1 = c(groups[4], groups[3]))
 ```
 
 ```{r}
@@ -285,108 +284,6 @@ src <- knitr::knit_expand(file = "_comparison.Rmd", case = case, ctrl = ctrl, th
 res <- knitr::knit_child(text = src, quiet = TRUE)
 
 cat(res, sep = "\n")
-```
-
-```{r}
-#| results: "asis"
-#| echo: FALSE
-#| include: TRUE
-#| label: "childB"
-#| fig-width: 6
-#| fig-height: 6
-#| fig-cap: "Heatmap of pariwise group camparison"
-
-case <- comparisons$COMP2[1]
-ctrl <- comparisons$COMP2[2]
-random <- "B"
-threshold <- params$threshold
-
-src <- knitr::knit_expand(file = "_comparison.Rmd", case = case, ctrl = ctrl, threshold = threshold, chip = params$chip_type)
-
-res <- knitr::knit_child(text = src, quiet = TRUE)
-
-cat(res, sep = "\n")
-```
-
-```{r}
-#| results: "asis"
-#| echo: FALSE
-#| include: TRUE
-#| label: "childC"
-#| fig-width: 6
-#| fig-height: 6
-#| fig-cap: "Heatmap of pariwise group camparison"
-
-case <- comparisons$COMP3[1]
-ctrl <- comparisons$COMP3[2]
-random <- "C"
-threshold <- params$threshold
-
-src <- knitr::knit_expand(file = "_comparison.Rmd", case = case, ctrl = ctrl, threshold = threshold, chip = params$chip_type)
-
-res <- knitr::knit_child(text = src, quiet = TRUE)
-
-cat(res, sep = "\n")
-```
-
-```{r}
-#| results: "asis"
-#| echo: FALSE
-#| include: TRUE
-#| label: "childD"
-#| fig-width: 6
-#| fig-height: 6
-#| fig-cap: "Heatmap of pariwise group camparison"
-
-case <- comparisons$COMP4[1]
-ctrl <- comparisons$COMP4[2]
-random <- "D"
-threshold <- params$threshold
-
-src <- knitr::knit_expand(file = "_comparison.Rmd", case = case, ctrl = ctrl, threshold = threshold, chip = params$chip_type)
-
-res <- knitr::knit_child(text = src, quiet = TRUE)
-
-cat(res, sep = "\n")
-```
-
-
-```{r}
-#| label: "fingerprint"
-
-process_data <- function(file) {
-  path <- file.path("results", file)
-  
-  components <- str_split(file, "_", simplify = TRUE)
-  
-  case <- components[1,2]
-  ctrl <- components[1,3]
-  
-  dataset <- read_csv(path) |> 
-    mutate(case = case,
-           control = ctrl) |> 
-    arrange(totalMeanLFC) |> 
-    select(Peptide, totalMeanLFC, LFC_SD, case, control) |> 
-    rename_with(str_to_lower) |> 
-    distinct()
-}
-
-file_data <- list.files("results", "STK.csv") |> 
-  map_dfr(process_data) |> 
-  write_csv("results/dpp_all.csv")
-
-file_data |> 
-  mutate(comparison = str_c(case, control, sep = " v ")) |> 
-  select(-case, -control, -lfc_sd) |> 
-  pivot_wider(names_from = comparison, values_from = totalmeanlfc) |> 
-  write_csv("results/dpp_all_wide.csv")
-
-filterable <- file_data |> 
-  filter(control == "WT-UT") |> 
-  select(totalmeanlfc, peptide, case) |> 
-  pivot_wider(names_from = case, values_from = totalmeanlfc) |> 
-  write_csv("results/dpp_WT-UT.csv")
-
 ```
 
 # Session Info
