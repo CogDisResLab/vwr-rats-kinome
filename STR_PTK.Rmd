@@ -202,7 +202,7 @@ krsa_violin_plot(data_modeled$scaled, clean_peptides, "Group")
 # Plot a violin figure and facet by the (Barcode) variable
 krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("STR_CTL", "STR_Exer"))
 
-ggsave("figures/HPC_PTK_Violin-Plots.svg", width = 11, height = 8.5, plot = {krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("STR_CTL", "STR_Exer"))})
+ggsave("figures/STR_PTK_Violin-Plots.svg", width = 11, height = 8.5, plot = {krsa_violin_plot(data_modeled$scaled, clean_peptides, "Barcode", groups = c("STR_CTL", "STR_Exer"))})
 ```
 
 ### Global Heatmaps
@@ -218,7 +218,7 @@ The heatmap represent all the peptides present on the chip except the positive/i
 # Generates a heatmap using the modeled normalized data
 krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("STR_CTL", "STR_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
 dev.off()
-svg("figures/HPC_PTK_Heatmap.svg", width = 8.5, height = 11)
+svg("figures/STR_PTK_Heatmap.svg", width = 8.5, height = 11)
 krsa_heatmap(data_modeled$normalized, clean_peptides, scale = "row", groups = c("STR_CTL", "STR_Exer"), cluster_rows = TRUE, cluster_cols = FALSE, treeheight_row = 0)
 dev.off()
 
