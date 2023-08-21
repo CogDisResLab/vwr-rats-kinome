@@ -70,6 +70,8 @@ This waterfall represents the log2 fold changes between the two groups at each p
 
 # generates a waterfall of the log2 fold change values for the selected peptide (top peptides)
 krsa_waterfall(differential_phosphorylated_peptides, lfc_thr = 0.2, byChip = F)
+
+ggsave("{{case}}-{{ctrl}}-KRSA-waterfall.svg", plot = krsa_waterfall(differential_phosphorylated_peptides, lfc_thr = 0.2, byChip = F), path = "figures")
 ```
 
 #### Upstream Kinase Analysis
