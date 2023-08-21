@@ -177,7 +177,7 @@ We will plot the individual and averaged Z scores using both the across and with
 # Generates Z scores waterfall plots
 krsa_zscores_plot(AvgZTable2)
 
-ggsave("{{case}}_{{ctrl}}_{{chip}}-KRSA-waterfall.svg", plot = krsa_zscores_plot(AvgZTable2), path = "figures")
+ggsave("{{case}}_{{ctrl}}_{{chip}}-KRSA-waterfall.svg", plot = krsa_zscores_plot(AvgZTable2), path = "figures", height = 11, width = 7.5)
 ```
 
 #### Reverse KRSA Plot
