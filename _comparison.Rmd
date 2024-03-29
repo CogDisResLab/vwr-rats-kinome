@@ -37,6 +37,11 @@ sigPepsPerChip <- krsa_get_diff_byChip(differential_phosphorylated_peptides, LFC
 sigPeps_total <- list(significant_peptides, sigPepsPerChip) %>%
   unlist(recursive = F) %>%
   unlist(recursive = F)
+
+  write_file(
+    str_c(significant_peptides$meanLFC$`0.2`, collapse = "\n"),
+    "results/{{if_else(exists('run_prefix'), str_c(run_prefix, '-'), '')}}significant_peptides_0.2_{{case}}_{{ctrl}}-{{chip}}.txt"
+  )
 ```
 
 #### Heatmap
