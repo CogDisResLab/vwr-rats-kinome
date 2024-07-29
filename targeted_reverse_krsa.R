@@ -105,22 +105,25 @@ ggsave("figures/targeted_reverse_krsa_str.png", hpc_p, width = 12, height = 8, u
 ggsave("figures/targeted_reverse_krsa_str.svg", hpc_p, width = 12, height = 8, units = "in", dpi = 300)
 
 g <- dpp_kinase_data |>
+mutate(Tissue = factor(Tissue, levels = c("HPC", "STR"), labels = c("Hippocampus", "Dorsal Striatum")),
+Chip = factor(Chip, levels = c("PTK", "STK"), labels = c("Tyrosine Kinases", "Serine/Threonine Kinases"))) |>
   ggplot(aes(x = Kinase, y = LFC, color = Significant))
 
 p <- g +
   # geom_boxplot() +
   geom_point(position = position_jitter(
     width = 0.1, seed = 1989L
-  )) +
+  ), size = 3) +
   scale_color_manual(
     values = c("TRUE" = "red", "FALSE" = "black")
   ) +
+  scale_y_continuous(limits = c(-1, 1), oob = scales::squish) +
   geom_hline(yintercept = c(0.2, -0.2), linetype = "dashed") +
   theme_linedraw() +
   xlab("Kinase Family") + ylab("Fold Change") +
-  theme(axis.text.x = element_text(angle = 90L, hjust = 1L)) +
+  theme(text = element_text(size = 24)) +
   guides(color = "none") +
   facet_grid(rows = vars(Tissue), cols = vars(Chip), scales = "free_x")
 
-ggsave("figures/targeted_reverse_krsa_grid.png", p, width = 12, height = 8, units = "in", dpi = 300, bg = "white")
-ggsave("figures/targeted_reverse_krsa_grid.svg", p, width = 12, height = 8, units = "in", dpi = 300)
+ggsave("figures/targeted_reverse_krsa_grid.png", p, width = 20, height = 16, units = "in", dpi = 1200, bg = "white")
+ggsave("figures/targeted_reverse_krsa_grid.svg", p, width = 20, height = 16, units = "in", dpi = 1200)
