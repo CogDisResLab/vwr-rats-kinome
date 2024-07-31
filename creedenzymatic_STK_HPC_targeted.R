@@ -21,4 +21,4 @@ quartile_fig |>
   ggsave("figures/hpc_stk_targeted_quartile_figure.png", plot = _, width = 10, height = 2, units = "in", bg = "white")
 
 quartile_fig |>
-  ggsave("figures/hpc_stk_targeted_quartile_figure.pdf", plot = _, width = 10, height = 2, units = "in", bg = "white")
+  ggsave("figures/hpc_stk_targeted_quartile_figure.svg", plot = _, width = 10, height = 2, units = "in", bg = "white")
