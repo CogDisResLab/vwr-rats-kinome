@@ -12,7 +12,7 @@ sig_kinases <- kinome_mp_file |>
   pull(hgnc_symbol)
 
 quartile_fig <- combined |>
-  filter(hgnc_symbol %in% sig_kinases) |>
+  filter(hgnc_symbol %in% sig_kinases, Method != "PTM-SEA") |>
   quartile_figure() +
   guides(shape = "none") +
   scale_size_discrete(name = "Quartile")
