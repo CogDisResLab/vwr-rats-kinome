@@ -105,8 +105,10 @@ ggsave("figures/targeted_reverse_krsa_str.png", hpc_p, width = 12, height = 8, u
 ggsave("figures/targeted_reverse_krsa_str.svg", hpc_p, width = 12, height = 8, units = "in", dpi = 300)
 
 g <- dpp_kinase_data |>
-mutate(Tissue = factor(Tissue, levels = c("HPC", "STR"), labels = c("Hippocampus", "Dorsal Striatum")),
-Chip = factor(Chip, levels = c("PTK", "STK"), labels = c("Tyrosine Kinases", "Serine/Threonine Kinases"))) |>
+  mutate(
+    Tissue = factor(Tissue, levels = c("HPC", "STR"), labels = c("Hippocampus", "Dorsal Striatum")),
+    Chip = factor(Chip, levels = c("PTK", "STK"), labels = c("Tyrosine Kinases", "Serine/Threonine Kinases"))
+  ) |>
   ggplot(aes(x = Kinase, y = LFC, color = Significant))
 
 p <- g +
@@ -127,3 +129,47 @@ p <- g +
 
 ggsave("figures/targeted_reverse_krsa_grid.png", p, width = 20, height = 16, units = "in", dpi = 1200, bg = "white")
 ggsave("figures/targeted_reverse_krsa_grid.svg", p, width = 20, height = 16, units = "in", dpi = 1200)
+
+ptk_g <- dpp_kinase_data |>
+  filter(Chip == "PTK") |>
+  ggplot(aes(x = Kinase, y = LFC, color = Significant))
+
+ptk_p <- ptk_g +
+  # geom_boxplot() +
+  geom_point(position = position_jitter(
+    width = 0.1, seed = 1989L
+  )) +
+  scale_color_manual(
+    values = c("TRUE" = "red", "FALSE" = "black")
+  ) +
+  geom_hline(yintercept = c(0.2, -0.2), linetype = "dashed") +
+  theme_linedraw() +
+  xlab("Kinase Family") + ylab("Fold Change") +
+  theme(axis.text.x = element_text(angle = 90L, hjust = 1L)) +
+  guides(color = "none") +
+  facet_grid(cols = vars(Tissue), scales = "free_x")
+
+ggsave("figures/targeted_reverse_krsa_ptk.png", ptk_p, width = 12, height = 6, units = "in", dpi = 300, bg = "white")
+ggsave("figures/targeted_reverse_krsa_ptk.svg", ptk_p, width = 12, height = 6, units = "in", dpi = 300)
+
+stk_g <- dpp_kinase_data |>
+  filter(Chip == "STK") |>
+  ggplot(aes(x = Kinase, y = LFC, color = Significant))
+
+stk_p <- stk_g +
+  # geom_boxplot() +
+  geom_point(position = position_jitter(
+    width = 0.1, seed = 1989L
+  )) +
+  scale_color_manual(
+    values = c("TRUE" = "red", "FALSE" = "black")
+  ) +
+  geom_hline(yintercept = c(0.2, -0.2), linetype = "dashed") +
+  theme_linedraw() +
+  xlab("Kinase Family") + ylab("Fold Change") +
+  theme(axis.text.x = element_text(angle = 90L, hjust = 1L)) +
+  guides(color = "none") +
+  facet_grid(cols = vars(Tissue), scales = "free_x")
+
+ggsave("figures/targeted_reverse_krsa_stk.png", stk_p, width = 12, height = 6, units = "in", dpi = 300, bg = "white")
+ggsave("figures/targeted_reverse_krsa_stk.svg", stk_p, width = 12, height = 6, units = "in", dpi = 300)
