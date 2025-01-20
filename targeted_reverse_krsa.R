@@ -38,19 +38,21 @@ dpp_data <- list.files(path = "results", pattern = "dpp", full.names = TRUE) |>
 stk_mapping <- KRSA_Mapping_STK_PamChip_87102_v1 |>
   rename(Peptide = Substrates, Kinase = Kinases) |>
   separate_longer_delim(Kinase, delim = " ") |>
-  unique()
+  unique() |>
+  mutate(Chip = "STK")
 
 ptk_mapping <- KRSA_Mapping_PTK_PamChip_86402_v1 |>
   rename(Peptide = Substrates, Kinase = Kinases) |>
   separate_longer_delim(Kinase, delim = " ") |>
-  unique()
+  unique() |>
+  mutate(Chip = "PTK")
 
 chip_mapping <- stk_mapping |>
   bind_rows(ptk_mapping) |>
   filter(Kinase %in% kinases_of_interest)
 
 dpp_kinase_data <- dpp_data |>
-  inner_join(chip_mapping, by = "Peptide", relationship = "many-to-many") |>
+  inner_join(chip_mapping, by = c("Peptide", "Chip"), relationship = "many-to-many") |>
   mutate(Significant = LFC < -0.2 | LFC > 0.2)
 
 ordered_kinases <- dpp_kinase_data |>
